@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>AMPLIFTED - Music Player</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    rel="stylesheet"
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+    crossorigin="anonymous"
+  />
+
+  <!-- Google Material Icons -->
+  <link
+    href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    rel="stylesheet"
+  />
+
+  <!-- Font Awesome (for extra icons like search, user, etc.) -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    integrity="sha512-dymI2Naf6xjKqvC/8AjtKoa6HgMHqYjgJv1nVbWcv16O3MHuvb6jVWeItPxX2VINeodIZ6Tn6PvxI6Bfq5V5yQ=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- Google Font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: radial-gradient(circle at top, #1e1e2f, #050509);
+      color: #f5f5f5;
+      min-height: 100vh;
+      padding-bottom: 90px; /* space for audio bar */
+    }
+
+    /* Navbar */
+    .navbar-custom {
+      background: rgba(5, 5, 10, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .navbar-brand {
+      letter-spacing: 2px;
+    }
+
+    .nav-link {
+      color: #b0b3c0 !important;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .nav-link:hover {
+      color: #ffffff !important;
+    }
+
+    /* Search */
+    .search-input {
+      background-color: #181824;
+      border: none;
+      color: #f5f5f5;
+    }
+
+    .search-input::placeholder {
+      color: #7b7f92;
+      font-size: 0.85rem;
+    }
+
+    .search-btn {
+      border-radius: 25px;
+      padding: 0 18px;
+      font-size: 0.85rem;
+    }
+
+    /* Layout */
+    .main-wrapper {
+      padding: 20px 30px;
+    }
+
+    .sidebar {
+      background: rgba(15, 15, 30, 0.96);
+      border-radius: 20px;
+      padding: 15px 12px;
+      height: calc(100vh - 120px);
+      overflow-y: auto;
+      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar-title {
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      color: #a3a7be;
+      margin-bottom: 10px;
+    }
+
+    .queue-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      cursor: pointer;
+      border-radius: 12px;
+      padding: 5px 6px;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .queue-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      transform: translateY(-1px);
+    }
+
+    .queue-item img {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      object-fit: cover;
+      margin-right: 10px;
+    }
+
+    .queue-song-title {
+      font-size: 0.75rem;
+      margin: 0;
+      color: #f5f5f5;
+      font-weight: 500;
+    }
+
+    .queue-song-artist {
+      font-size: 0.65rem;
+      margin: 0;
+      color: #898ca2;
+    }
+
+    /* Cards / Albums */
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .section-subtitle {
+      font-size: 0.8rem;
+      color: #a6a8bf;
+      margin-bottom: 18px;
+    }
+
+    .song-card {
+      background: linear-gradient(145deg, #1a1a2b, #11111b);
+      border: none;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.6);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      height: 100%;
+    }
+
+    .song-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+    }
+
+    .song-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+    }
+
+    .song-card-body {
+      padding: 10px 12px 12px 12px;
+    }
+
+    .song-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #fdfdfd;
+    }
+
+    .song-artist {
+      font-size: 0.75rem;
+      color: #a0a2bb;
+      margin-bottom: 4px;
+    }
+
+    .song-meta {
+      font-size: 0.7rem;
+      color: #6d7087;
+    }
+
+    /* Bottom Audio Bar */
+    .audio-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 70px;
+      background: rgba(10, 10, 20, 0.98);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      padding: 8px 20px;
+      z-index: 999;
+    }
+
+    .audio-now-playing {
+      color: #e5e7ff;
+      font-size: 0.85rem;
+      margin-bottom: 2px;
+    }
+
+    .audio-now-playing-sub {
+      color: #8e90aa;
+      font-size: 0.7rem;
+    }
+
+    .audio-controls-wrapper {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .audio-player {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ef5350;
+    }
+
+    @media (max-width: 991.98px) {
+      .main-wrapper {
+        padding: 15px;
+      }
+      .sidebar {
+        height: auto;
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+
+  <script>
+    function playAudio(audioSrc, title) {
+      var audioElement = document.getElementById("audio_play");
+      var nowPlayingTitle = document.getElementById("now_playing_title");
+
+      // Update audio source and play
+      audioElement.src = audioSrc;
+      audioElement.play();
+
+      // Update "Now Playing" text
+      if (title) {
+        nowPlayingTitle.textContent = title;
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+      <a
+        href="#"
+        class="navbar-brand text-danger font-weight-bold"
+        style="font-size: 1.7rem;"
+      >
+        AMPLIFTED
+      </a>
+
+      <button
+        class="navbar-toggle navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#nav1"
+        aria-controls="nav1"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon">
+          <i class="fas fa-bars" style="color: #fff;"></i>
+        </span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="nav1">
+        <ul class="navbar-nav mr-3">
+          <li class="nav-item">
+            <a href="#" class="nav-link">HOME</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">BROWSE</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">DISCOVER</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">RADIO</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">MY MUSIC</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">PODCASTS</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">INDIA'S MUSIC</a>
+          </li>
+        </ul>
+
+        <!-- Search bar -->
+        <form class="form-inline my-2 my-lg-0 flex-grow-1">
+          <div class="input-group w-100">
+            <input
+              type="text"
+              class="form-control search-input"
+              placeholder="Search for songs, artists, playlists and more"
+              aria-label="Search"
+            />
+            <div class="input-group-append">
+              <button
+                class="btn btn-danger search-btn"
+                type="button"
+              >
+                <i class="fas fa-search mr-1"></i> Search
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <!-- User / Login -->
+        <div class="ml-3 d-flex align-items-center">
+          <!-- Placeholder login link -->
+          <a
+            href="#"
+            class="btn btn-outline-danger btn-sm mr-2"
+            style="border-radius: 20px;"
+          >
+            Sign In / Login
+          </a>
+          <img
+            src="https://tse3.mm.bing.net/th?id=OIP.ruat7whad9-kcI8_1KH_tQHaGI&pid=Api&P=0&h=180"
+            alt="User"
+            class="user-avatar"
+          />
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="container-fluid main-wrapper">
+    <div class="row">
+      <!-- LEFT SIDEBAR: QUEUE -->
+      <div class="col-lg-2 col-md-3 mb-3">
+        <div class="sidebar">
+          <div
+            class="d-flex justify-content-between align-items-center mb-2"
+          >
+            <span class="sidebar-title">QUEUE</span>
+            <i class="material-icons" style="font-size: 18px;">queue_music</i>
+          </div>
+
+          <!-- Queue items (small list) -->
+          <div
+            class="queue-item"
+            onclick="playAudio('assets/audio/sample1.mp3','All Girls Are The Same - Juice WRLD (Sample)')"
+          >
+            <img
+              src="https://community.spotify.com/t5/image/serverpage/image-id/104727iC92B541DB372FBC7/image-size/large?v=v2&px=999"
+              alt="All Girls Are The Same"
+            />
+            <div>
+              <p class="queue-song-title">All Girls Are The Same</p>
+              <p class="queue-song-artist">Juice WRLD</p>
+            </div>
+          </div>
+
+          <div
+            class="queue-item"
+            onclick="playAudio('assets/audio/sample1.mp3','Starboy - The Weeknd (Sample)')"
+          >
+            <img
+              src="https://tse4.mm.bing.net/th?id=OIP.o5pwefYu1ARDX2Ye0401qgHaHa&pid=Api&P=0&h=180"
+              alt="Starboy"
+            />
+            <div>
+              <p class="queue-song-title">Starboy</p>
+              <p class="queue-song-artist">The Weeknd</p>
+            </div>
+          </div>
+
+          <div
+            class="queue-item"
+            onclick="playAudio('assets/audio/sample1.mp3','After Hours - The Weeknd (Sample)')"
+          >
+            <img
+              src="https://i.pinimg.com/originals/30/93/f0/3093f0acc77571b92f738646e0ef9e84.jpg"
+              alt="After Hours"
+            />
+            <div>
+              <p class="queue-song-title">After Hours</p>
+              <p class="queue-song-artist">The Weeknd</p>
+            </div>
+          </div>
+
+          <div
+            class="queue-item"
+            onclick="playAudio('assets/audio/sample1.mp3','Call Out My Name - The Weeknd (Sample)')"
+          >
+            <img
+              src="https://i.pinimg.com/originals/30/93/f0/3093f0acc77571b92f738646e0ef9e84.jpg"
+              alt="Call Out My Name"
+            />
+            <div>
+              <p class="queue-song-title">Call Out My Name</p>
+              <p class="queue-song-artist">The Weeknd</p>
+            </div>
+          </div>
+
+          <div
+            class="queue-item"
+            onclick="playAudio('assets/audio/sample1.mp3','Ma Belle (Sample)')"
+          >
+            <img
+              src="https://play-lh.googleusercontent.com/I3sLvlBxW-Zc2Ym85D2sJwvDeckbuqHxPfZ7nPLUtq0PVDX8tmxbgZMuGQCoBDJyJg"
+              alt="Ma Belle"
+            />
+            <div>
+              <p class="queue-song-title">Ma Belle</p>
+              <p class="queue-song-artist">Trending</p>
+            </div>
+          </div>
+
+          <div
+            class="queue-item"
+            onclick="playAudio('assets/audio/sample1.mp3','Whoa (Mind in Awe) - XXXTentacion (Sample)')"
+          >
+            <img
+              src="https://consequence.net/wp-content/uploads/2018/12/xxxtentacion-skins.jpg?quality=80&w=1024"
+              alt="Whoa"
+            />
+            <div>
+              <p class="queue-song-title">Whoa (Mind in Awe)</p>
+              <p class="queue-song-artist">XXXTentacion</p>
+            </div>
+          </div>
+
+          <div
+            class="queue-item"
+            onclick="playAudio('assets/audio/sample1.mp3','SAD! - XXXTentacion (Sample)')"
+          >
+            <img
+              src="https://th.bing.com/th/id/OIP.R_3aDT-2q4dF2ztHTQdddAHaHO?pid=ImgDet&rs=1"
+              alt="SAD!"
+            />
+            <div>
+              <p class="queue-song-title">SAD!</p>
+              <p class="queue-song-artist">XXXTentacion</p>
+            </div>
+          </div>
+
+          <div
+            class="queue-item"
+            onclick="playAudio('assets/audio/sample1.mp3','Bad Vibes Forever - XXXTentacion (Sample)')"
+          >
+            <img
+              src="https://www.cruisedigital.co.uk/wp-content/uploads/2021/03/Bad-Vibes-For-Ever-XXXTentaction-Front-Cover.jpg"
+              alt="Bad Vibes Forever"
+            />
+            <div>
+              <p class="queue-song-title">Bad Vibes Forever</p>
+              <p class="queue-song-artist">XXXTentacion</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN SONG GRID -->
+      <div class="col-lg-10 col-md-9">
+        <!-- Section: Trending Now -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="section-title mb-0">Trending Now</h5>
+              <p class="section-subtitle mb-1">Based on what you love listening to</p>
+            </div>
+            <a href="#" style="font-size: 0.8rem; color: #a6a8bf;">View All</a>
+          </div>
+
+          <div class="row">
+            <!-- Dil Nu -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Dil Nu (Sample)')"
+              >
+                <img
+                  src="https://i.ytimg.com/vi/0qf3GbFSKA4/hqdefault.jpg"
+                  alt="Dil Nu"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Dil Nu</div>
+                  <div class="song-artist">Punjabi Vibes</div>
+                  <div class="song-meta">Single · 3:20</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hope -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Hope - NF (Sample)')"
+              >
+                <img
+                  src="https://www.ceenaija.com/wp-content/uploads/2023/02/NF-Hope.jpg"
+                  alt="Hope"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Hope</div>
+                  <div class="song-artist">NF</div>
+                  <div class="song-meta">Album · 2023</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Majhail -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Majhail (Sample)')"
+              >
+                <img
+                  src="https://th.bing.com/th/id/OIP.nox7_cuqiod64JmAJE5_SAAAAA?pid=ImgDet&rs=1"
+                  alt="Majhail"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Majhail</div>
+                  <div class="song-artist">Brown Munde Era</div>
+                  <div class="song-meta">Punjabi · 2020</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ma Belle -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Ma Belle (Sample)')"
+              >
+                <img
+                  src="https://th.bing.com/th/id/OIP.jseemD0XX608glHnUnG7hgAAAA?pid=ImgDet&rs=1"
+                  alt="Ma Belle"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Ma Belle</div>
+                  <div class="song-artist">Urban Pop</div>
+                  <div class="song-meta">Single</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SAD -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','SAD! - XXXTentacion (Sample)')"
+              >
+                <img
+                  src="https://th.bing.com/th/id/R.1c0e8ca0fb35998d38a9a6fe65855c5f?rik=iBeN1Lf8vlZNwA&riu=http%3a%2f%2fhiphopdx-production.s3.amazonaws.com%2f2018%2f03%2f180315-xxxtentacion-album-cover.jpg&ehk=gnQiL2usVEzMnk1x4st7yx4ifRf0LItnfaBkGXMkSPM%3d&risl=&pid=ImgRaw&r=0"
+                  alt="SAD!"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">SAD!</div>
+                  <div class="song-artist">XXXTentacion</div>
+                  <div class="song-meta">Emo Rap · Classic</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Whoa -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Whoa (Mind in Awe) - XXXTentacion (Sample)')"
+              >
+                <img
+                  src="https://consequence.net/wp-content/uploads/2018/12/xxxtentacion-skins.jpg?quality=80&w=1024"
+                  alt="Whoa"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Whoa (Mind in Awe)</div>
+                  <div class="song-artist">XXXTentacion</div>
+                  <div class="song-meta">Skins · 2018</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: New Releases -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="section-title mb-0">New Releases</h5>
+              <p class="section-subtitle mb-1">Fresh tracks picked for you</p>
+            </div>
+            <a href="#" style="font-size: 0.8rem; color: #a6a8bf;">View All</a>
+          </div>
+
+          <div class="row">
+            <!-- Heeriye -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Heeriye (Sample)')"
+              >
+                <img
+                  src="https://pagalfree.com/images/128Heeriye%20-%20Abhi%20Dutt%20128%20Kbps.jpg"
+                  alt="Heeriye"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Heeriye</div>
+                  <div class="song-artist">Romantic</div>
+                  <div class="song-meta">Feel Good</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Obsessed -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Obsessed (Sample)')"
+              >
+                <img
+                  src="https://a10.gaanacdn.com/gn_img/albums/mGjKr1b6zX/jKrPNa1yW6/size_l.jpg"
+                  alt="Obsessed"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Obsessed</div>
+                  <div class="song-artist">Punjabi Pop</div>
+                  <div class="song-meta">Hit Single</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Still Rollin -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Still Rollin (Sample)')"
+              >
+                <img
+                  src="https://pagalnew.com/coverimages/album/still-rollin-2023-0524-500-500.jpg"
+                  alt="Still Rollin"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Still Rollin</div>
+                  <div class="song-artist">AP Dhillon</div>
+                  <div class="song-meta">2023</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- True Stories -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','True Stories (Sample)')"
+              >
+                <img
+                  src="https://assets.audiomack.com/apdhillon/9157a2bdca285b4b90e1020d7f759f29cbd65c4d681ba54b379fd84d022c3cb4.jpeg?type=song&width=560&height=560&max=true"
+                  alt="True Stories"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">True Stories</div>
+                  <div class="song-artist">AP Dhillon</div>
+                  <div class="song-meta">EP</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- What Jhumka -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','What Jhumka (Sample)')"
+              >
+                <img
+                  src="https://tse3.mm.bing.net/th?id=OIP.BmXHnkOVYTz1shAtB9QrFQAAAA&pid=Api&P=0&h=180"
+                  alt="What Jhumka"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">What Jhumka</div>
+                  <div class="song-artist">Bollywood</div>
+                  <div class="song-meta">Dance · 2023</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- With You -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','With You (Sample)')"
+              >
+                <img
+                  src="https://cover.mr-jatt.im/thumb/491693/Saada-Pyaar-Original-1.jpg"
+                  alt="With You"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">With You</div>
+                  <div class="song-artist">Diljit Vibes</div>
+                  <div class="song-meta">Love · Chill</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Chill & Vibes -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="section-title mb-0">Chill & Vibes</h5>
+              <p class="section-subtitle mb-1">Lo-fi, pop & late night feels</p>
+            </div>
+            <a href="#" style="font-size: 0.8rem; color: #a6a8bf;">View All</a>
+          </div>
+
+          <div class="row">
+            <!-- In Love Again -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','In Love Again (Sample)')"
+              >
+                <img
+                  src="https://assets.audiomack.com/harmanhundal/113aa4f71220e9f210d24682cb7dbc474d72b63a32deb90df2ff4bd8e1c754ae.jpeg?type=song&width=560&height=560&max=true"
+                  alt="In Love Again"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">In Love Again</div>
+                  <div class="song-artist">Harman Hundal</div>
+                  <div class="song-meta">Single</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- I Don't Wanna Live Forever -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','I Don’t Wanna Live Forever (Sample)')"
+              >
+                <img
+                  src="https://images.genius.com/734ece38e8ab973f353e6c3beaea915a.1000x1000x1.jpg"
+                  alt="I Dont Wanna Live Forever"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">I Don’t Wanna Live Forever</div>
+                  <div class="song-artist">ZAYN, Taylor Swift</div>
+                  <div class="song-meta">OST · 50 Shades</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- If The World Was Ending -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','If The World Was Ending (Sample)')"
+              >
+                <img
+                  src="https://lh3.googleusercontent.com/_xArHrlaSMRiZMjMQ5ebCPSMBX5Yxx-dgDFTyCz9P-x5WGc-pqEWpZfXoWtNXcBCHSIVMS1GF_WouFQqPA=w544-h544-l90-rj"
+                  alt="If the World Was Ending"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">If The World Was Ending</div>
+                  <div class="song-artist">JP Saxe, Julia Michaels</div>
+                  <div class="song-meta">Sad · Soft</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Death Bed -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Death Bed (Sample)')"
+              >
+                <img
+                  src="https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/8b/a9/36/8ba936f3-2d8b-1012-89cc-92f75eb76961/886448289180.jpg/1200x1200bf-60.jpg"
+                  alt="Death Bed"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Death Bed</div>
+                  <div class="song-artist">Powfu, Beabadoobee</div>
+                  <div class="song-meta">Lo-fi · Viral</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- WYD Now -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','WYD Now? (Sample)')"
+              >
+                <img
+                  src="https://th.bing.com/th/id/OIP.kZEcWkqJHipFlp3nxKOccgHaHa?pid=ImgDet&rs=1"
+                  alt="WYD Now?"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">WYD Now?</div>
+                  <div class="song-artist">Sadie Jean</div>
+                  <div class="song-meta">TikTok · Feels</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Golden Hour -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Golden Hour (Sample)')"
+              >
+                <img
+                  src="https://th.bing.com/th/id/OIP.x8c5sZTJJgeTa-w2dSCeVAHaHa?pid=ImgDet&rs=1"
+                  alt="Golden Hour"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Golden Hour</div>
+                  <div class="song-artist">JVKE</div>
+                  <div class="song-meta">Aesthetic · Piano</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW SECTION: More From Your Library -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="section-title mb-0">More From Your Library</h5>
+              <p class="section-subtitle mb-1">
+                Handpicked tracks you've added to your collection
+              </p>
+            </div>
+            <a href="#" style="font-size: 0.8rem; color: #a6a8bf;">View All</a>
+          </div>
+
+          <div class="row">
+            <!-- Moti Chain -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Moti Chain Mota Paisa (Sample)')"
+              >
+                <img
+                  src="https://th.bing.com/th/id/OIP.MUbARDfCmiDxMxTazclAWAAAAA?pid=ImgDet&rs=1"
+                  alt="Moti Chain"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Moti Chain</div>
+                  <div class="song-artist">Desi Swag</div>
+                  <div class="song-meta">Banger</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Wishes -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Wishes - Carter Ryan (Sample)')"
+              >
+                <img
+                  src="https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/2c/ef/3c/2cef3cd3-af28-bd4b-9271-d63a7104670d/artwork.jpg/1200x1200bf-60.jpg"
+                  alt="Wishes"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Wishes</div>
+                  <div class="song-artist">Carter Ryan</div>
+                  <div class="song-meta">Chill Pop</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gypsy -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Gypsy (Sample)')"
+              >
+                <img
+                  src="https://c.saavncdn.com/268/Gypsy-Haryanvi-2022-20220428195345-500x500.jpg"
+                  alt="Gypsy"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Gypsy</div>
+                  <div class="song-artist">Haryanvi</div>
+                  <div class="song-meta">2022</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Laado -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Laado (Sample)')"
+              >
+                <img
+                  src="https://tse4.mm.bing.net/th?id=OIP.bJPZLGwssAVYKA927CdSbgAAAA&pid=Api&P=0&h=180"
+                  alt="Laado"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Laado</div>
+                  <div class="song-artist">Folk / Pop</div>
+                  <div class="song-meta">Single</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Take A Step Back -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Take A Step Back (Sample)')"
+              >
+                <img
+                  src="https://tse1.mm.bing.net/th?id=OIP.0O8C78-CkCVwlQ9v7z2fhAAAAA&pid=Api&P=0&h=180"
+                  alt="Take A Step Back"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Take A Step Back</div>
+                  <div class="song-artist">Ski Mask & X</div>
+                  <div class="song-meta">Rage · Hype</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Kaley-Sheshe -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Kaley Sheshe (Sample)')"
+              >
+                <img
+                  src="https://th.bing.com/th/id/OIP.o59-EICPABXPaGBseDvN6QHaHa?pid=ImgDet&rs=1"
+                  alt="Kaley Sheshe"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Kaley Sheshe</div>
+                  <div class="song-artist">Addy Nagar</div>
+                  <div class="song-meta">Desi · 2021</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <!-- It's You -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','It’s You - Ali Gatie (Sample)')"
+              >
+                <img
+                  src="https://th.bing.com/th/id/OIP.KMUj5f1pzm43HJ1sC32t4wHaHa?pid=ImgDet&w=2000&h=2000&rs=1"
+                  alt="It's You"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">It’s You</div>
+                  <div class="song-artist">Ali Gatie</div>
+                  <div class="song-meta">Heartbreak</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hate Me -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Hate Me - Ellie Goulding ft. Juice WRLD (Sample)')"
+              >
+                <img
+                  src="https://img.discogs.com/wRZhl8bjIFNIU4xAMOcB8ajyoAY=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-13826768-1561996854-8009.jpeg.jpg"
+                  alt="Hate Me"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Hate Me</div>
+                  <div class="song-artist">Ellie Goulding, Juice WRLD</div>
+                  <div class="song-meta">Pop · 2019</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bandit -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Bandit - Juice WRLD (Sample)')"
+              >
+                <img
+                  src="https://th.bing.com/th/id/OIP.GsWuJSA94jsavJGetaPktwHaHa?pid=ImgDet&rs=1"
+                  alt="Bandit"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Bandit</div>
+                  <div class="song-artist">Juice WRLD</div>
+                  <div class="song-meta">Trap · Banger</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bad Vibes Forever (card as well) -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','Bad Vibes Forever - XXXTentacion (Sample)')"
+              >
+                <img
+                  src="https://www.cruisedigital.co.uk/wp-content/uploads/2021/03/Bad-Vibes-For-Ever-XXXTentaction-Front-Cover.jpg"
+                  alt="Bad Vibes Forever"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Bad Vibes Forever</div>
+                  <div class="song-artist">XXXTentacion</div>
+                  <div class="song-meta">Emo Rap</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- The Remedy for a Broken Heart -->
+            <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+              <div
+                class="song-card"
+                onclick="playAudio('assets/audio/sample1.mp3','The Remedy for a Broken Heart - XXXTentacion (Sample)')"
+              >
+                <img
+                  src="https://th.bing.com/th/id/OIP.R_3aDT-2q4dF2ztHTQdddAHaHO?pid=ImgDet&rs=1"
+                  alt="The Remedy for a Broken Heart"
+                />
+                <div class="song-card-body">
+                  <div class="song-title">Remedy for a Broken Heart</div>
+                  <div class="song-artist">XXXTentacion</div>
+                  <div class="song-meta">Sad · Emotional</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- end col-lg-10 -->
+    </div> <!-- end row -->
+  </div> <!-- end container -->
+
+  <!-- AUDIO PLAYER BAR -->
+  <div class="audio-bar">
+    <div>
+      <div class="audio-now-playing">NOW PLAYING</div>
+      <div id="now_playing_title" class="audio-now-playing-sub">
+        Nothing playing yet...
+      </div>
+    </div>
+
+    <div class="audio-controls-wrapper">
+      <audio
+        id="audio_play"
+        class="audio-player"
+        controls
+      ></audio>
+    </div>
+
+    <div>
+      <i class="material-icons" style="font-size: 20px; color: #ef5350;">
+        favorite_border
+      </i>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS + deps -->
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+          integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+          integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+          crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+          integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9GfXnEw3QFZCSskv9kR8GqU8iB0Q5dQv4"
+          crossorigin="anonymous"></script>
+</body>
+</html>
